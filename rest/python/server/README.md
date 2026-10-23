@@ -127,6 +127,31 @@ Each verified request logs
 `RFC 9421 signature verified (keyid=..., profile=...)`. Add `--require_signatures`
 to reject anything unsigned.
 
+## Transaction-Bound Screening Evidence (Experimental Reference)
+
+[`screening_evidence.py`](screening_evidence.py) demonstrates how a Business
+can validate a signed, vendor-namespaced Checkout Signal and keep completion
+blocked when the evidence no longer covers the current transaction. It binds
+evidence to the Checkout and to distinct buyer, payer, seller, goods-recipient,
+destination, and transaction-context facts. A change to any binding, an expired
+or overly old result, an untrusted issuer/key, or signature tampering fails
+closed and requires reevaluation.
+
+The example is intentionally not a screening service or a legal-compliance
+claim. It does not add a Core field or a `dev.ucp.*` identifier. The Business
+owns the policy decision; the Signal supplies independently verifiable input.
+The helper maps an unmet local policy to the existing `incomplete` status and a
+recoverable `signal` Message. It emits the illustrative vendor Action only when
+the caller confirms that the Action's extension was negotiated; an Action is
+not a generic transport for evidence and does not make an external interaction
+authoritative for Checkout state.
+
+Run the focused reference tests:
+
+```shell
+uv run pytest -v screening_evidence_test.py
+```
+
 ## Webhook Signing & Delivery Retry
 
 Outbound order-event webhooks are signed as the business, per the
